@@ -15,6 +15,7 @@ usage() {
 	  edit
 	  ls
 	  read
+	  rm
 	  tree
 	  restore
 
@@ -235,6 +236,62 @@ sc_read() {
 	done
 }
 
+usage_rm() {
+	echo "Usage: $progname rm [-h] [[[yyyy]mm]dd ...]" >&2
+	cat >&2 <<-'EOF'
+
+	Options:
+	  -h, --help    Display this help message and exit
+	EOF
+}
+
+sc_rm() {
+	local i f
+	local -a dates
+
+	while [ $# -ne 0 ]; do
+		case "$1" in
+			-h|--help)
+				usage_rm
+				exit
+				;;
+			-*)
+				perror "Invalid option: $1"
+				usage_rm
+				exit 1
+				;;
+			*)
+				if [[ $1 =~ ^[0-9]{2}$ ]]; then
+					dates+=("$(date '+%Y%m')$1")
+				elif [[ $1 =~ ^[0-9]{4}$ ]]; then
+					dates+=("$(date '+%Y')$1")
+				elif [[ $1 =~ ^[0-9]{8}$ ]]; then
+					dates+=("$1")
+				else
+					usage_rm
+					exit 1
+				fi
+				;;
+		esac
+		shift
+	done
+
+	if [ ${#dates[@]} -eq 0 ]; then
+		usage_rm
+		exit 1
+	fi
+
+	for i in "${dates[@]}"; do
+		f="${i:0:4}/${i:4:2}/${i:6:2}.md"
+		if ! [ -e "$datadir/$f" ]; then
+			perror "$i: No such diary"
+			continue
+		fi
+		mv "$datadir/$f" "$datadir/backup/$i.md"
+		echo "Removed $i"
+	done
+}
+
 usage_tree() {
 	echo "Usage: $progname tree [-h]" >&2
 	cat >&2 <<-'EOF'
@@ -391,6 +448,10 @@ main() {
 				subcmd=read
 				break
 				;;
+			rm)
+				subcmd=rm
+				break
+				;;
 			tree)
 				subcmd=tree
 				break
@@ -433,6 +494,7 @@ main() {
 		edit) sc_edit "$@" ;;
 		ls) sc_ls "$@" ;;
 		read) sc_read "$@" ;;
+		rm) sc_rm "$@" ;;
 		tree) sc_tree "$@" ;;
 		restore) sc_restore "$@" ;;
 	esac
