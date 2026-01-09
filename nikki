@@ -14,7 +14,7 @@ usage() {
 	Commands:
 	  edit
 	  ls
-	  cat
+	  read
 	  tree
 	  restore
 
@@ -184,8 +184,8 @@ sc_ls() {
 	done
 }
 
-usage_cat() {
-	echo "Usage: $progname cat [-h] [[[yyyy]mm]dd ...]" >&2
+usage_read() {
+	echo "Usage: $progname read [-h] [[[yyyy]mm]dd ...]" >&2
 	cat >&2 <<-'EOF'
 
 	Options:
@@ -193,19 +193,19 @@ usage_cat() {
 	EOF
 }
 
-sc_cat() {
+sc_read() {
 	local i f
 	local -a dates
 
 	while [ $# -ne 0 ]; do
 		case "$1" in
 			-h|--help)
-				usage_cat
+				usage_read
 				exit
 				;;
 			-*)
 				perror "Invalid option: $1"
-				usage_cat
+				usage_read
 				exit 1
 				;;
 			*)
@@ -372,7 +372,7 @@ main() {
 			-p|--pager)
 				shift
 				if [ $# -eq 0 ]; then
-					usage_cat
+					usage_read
 					exit 1
 				fi
 				pager="$1"
@@ -387,8 +387,8 @@ main() {
 				subcmd=ls
 				break
 				;;
-			cat)
-				subcmd=cat
+			read)
+				subcmd=read
 				break
 				;;
 			tree)
@@ -432,7 +432,7 @@ main() {
 	case "$subcmd" in
 		edit) sc_edit "$@" ;;
 		ls) sc_ls "$@" ;;
-		cat) sc_cat "$@" ;;
+		read) sc_read "$@" ;;
 		tree) sc_tree "$@" ;;
 		restore) sc_restore "$@" ;;
 	esac
