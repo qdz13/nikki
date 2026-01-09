@@ -330,7 +330,8 @@ sc_restore() {
 		exit 1
 	fi
 
-	files=($(find "$datadir/backup" -type f -print 2>/dev/null | sed -e "s|^$datadir/backup/||g" -e 's/\.md$//g' | sort -nr))
+	files=($(find "$datadir/backup" -type f -print 2>/dev/null |
+			 sed -e "s|^$datadir/backup/||g" -e 's/\.md$//g' | sort -nr))
 	if [ ${#files[@]} -eq 0 ]; then
 		perror "Couldn't find any backup file"
 		exit 1
