@@ -167,8 +167,9 @@ sc_ls() {
 		shift
 	done
 	if [ ${#dirs[@]} -eq 0 ]; then
-		dirs+=("$(date '+%Y')")
-		month=false
+		find "$datadir" -not -name "$progname" -not -name backup -type d -maxdepth 1 -print |
+			sed  -e "s|^$datadir/||" -e 's|/||g' -e 's/\.md$//' | sort -n
+		exit
 	fi
 
 	for i in "${dirs[@]}"; do
@@ -179,7 +180,7 @@ sc_ls() {
 			else
 				find "$datadir/$i" -not -name "$i" -type d -maxdepth 1 -print
 			fi
-		} | sed -e "s|^$datadir/||" -e 's|/||g' -e 's/\.md$//'
+		} | sed -e "s|^$datadir/||" -e 's|/||g' -e 's/\.md$//' | sort -n
 	done
 }
 
