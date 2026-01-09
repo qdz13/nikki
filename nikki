@@ -389,10 +389,7 @@ sc_restore() {
 	while :; do
 		read -er -p "[S]ee the backup file, [R]estore it, or [E]xit? [E] " answer
 		case "$answer" in
-			s|S)
-				"${pagercmd[@]}" "$datadir/backup/$f.md"
-				break
-				;;
+			s|S) "${pagercmd[@]}" "$datadir/backup/$f.md" ;;
 			r|R)
 				mv "$datadir/backup/$f.md" "$datadir/${f:0:4}/${f:4:2}/${f:6:2}.md"
 				break
