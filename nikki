@@ -107,7 +107,7 @@ sc_edit() {
 		mkdir -p "${f%/*}"
 		[ -e "$f" ] && sed 1,4d "$f" > "$tmp"
 
-		"$ed" "$tmp"
+		"$editor" "$tmp"
 
 		if [ -e "$f" ]; then
 			cmp -s <(sed 1,4d "$tmp") "$f" && return
@@ -347,19 +347,20 @@ sc_restore() {
 
 main() {
 	local i subcmd pager
-	declare progname datadir ed tmp
+	declare progname datadir editor tmp
 	declare -a pagercmd
 
 	progname=nikki
 	datadir="${XDG_DATA_HOME:-$HOME/.local/share}/$progname"
 	[ -d "$datadir" ] || mkdir -p "$datadir"
+	#shellcheck disable=SC2153
 	for i in "$EDITOR" "$VISUAL" nvim vim nvi vi; do
 		if [ -n "$i" ]; then
-			ed="$i"
+			editor="$i"
 			break
 		fi
 	done
-	if [ -z "$ed" ]; then
+	if [ -z "$editor" ]; then
 		perror "Failed to set the editor"
 		exit 1
 	fi
