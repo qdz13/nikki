@@ -27,6 +27,7 @@ perror() {
 }
 
 rmoldcache() {
+	# Delete backup files that are more than 3 days old
 	[ -d "$datadir/backup" ] && find "$datadir/backup" -type f -mtime +3 -delete
 }
 
