@@ -265,7 +265,7 @@ sc_tree() {
 	{
 		printf "\033[34m\033[1m%s\033[0m\n" "$progname"
 		tree -C -I backup "$datadir" | sed '1d'
-	}| less
+	} | less
 }
 
 usage_restore() {
