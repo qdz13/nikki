@@ -102,7 +102,7 @@ sc_edit() {
 				usage_edit
 				exit 1
 			elif ! [ -e "$f" ]; then
-				perror "$fname: No such diary"
+				perror "$i: No such diary"
 				exit 1
 			fi
 		fi
@@ -217,7 +217,7 @@ sc_read() {
 				elif [[ $1 =~ ^[0-9]{8}$ ]]; then
 					dates+=("$1")
 				else
-					usage_edit
+					usage_read
 					exit 1
 				fi
 				;;
@@ -229,7 +229,7 @@ sc_read() {
 	for i in "${dates[@]}"; do
 		f="$datadir/${i:0:4}/${i:4:2}/${i:6:2}.md"
 		if ! [ -e "$f" ]; then
-			perror "$f: No such file"
+			perror "$i: No such diary"
 			continue
 		fi
 		"${pagercmd[@]}" "$f"
