@@ -34,7 +34,8 @@ cleanup() {
 }
 
 maketmp() {
-	tmp=$(mktemp)
+	# Avoid using `mktemp` to enable syntax highlighting in Neovim
+	tmp="/tmp/$progname.md"
 	trap 'cleanup' HUP INT QUIT PIPE TERM
 }
 
