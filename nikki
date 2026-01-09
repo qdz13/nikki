@@ -354,12 +354,7 @@ main() {
 	datadir="${XDG_DATA_HOME:-$HOME/.local/share}/$progname"
 	[ -d "$datadir" ] || mkdir -p "$datadir"
 	#shellcheck disable=SC2153
-	for i in "$EDITOR" "$VISUAL" nvim vim nvi vi; do
-		if [ -n "$i" ]; then
-			editor="$i"
-			break
-		fi
-	done
+	editor="${EDITOR:-$VISUAL}"
 	if [ -z "$editor" ]; then
 		perror "Failed to set the editor"
 		exit 1
