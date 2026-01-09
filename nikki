@@ -4,11 +4,12 @@
 # FUNCTIONS
 
 usage() {
-	echo "Usage: $progname [-h] [command] [options]" >&2
+	echo "Usage: $progname [-h] [-p pager] [command] [options]" >&2
 	cat >&2 <<-'EOF'
 
 	Global options:
-	  -h, --help  Display this help message and exit
+	  -h, --help   Display this help message and exit
+	  -p, --pager  Set pager (cat, less, bat (default), glow)
 
 	Commands:
 	  edit
@@ -182,32 +183,23 @@ sc_ls() {
 }
 
 usage_cat() {
-	echo "Usage: $progname cat [-hp] [[[yyyy]mm]dd ...]" >&2
+	echo "Usage: $progname cat [-h] [[[yyyy]mm]dd ...]" >&2
 	cat >&2 <<-'EOF'
 
 	Options:
 	  -h, --help    Display this help message and exit
-	  -p, --pager   Set pager (cat, less, bat, glow)
 	EOF
 }
 
 sc_cat() {
-	local pager i f
-	local -a pagercmd dates
+	local i f
+	local -a dates
 
 	while [ $# -ne 0 ]; do
 		case "$1" in
 			-h|--help)
 				usage_cat
 				exit
-				;;
-			-p|--pager)
-				shift
-				if [ $# -eq 0 ]; then
-					usage_cat
-					exit 1
-				fi
-				pager="$1"
 				;;
 			-*)
 				perror "Invalid option: $1"
@@ -230,25 +222,6 @@ sc_cat() {
 		shift
 	done
 	[ ${#dates[@]} -eq 0 ] && dates+=("$(date '+%Y%m%d')")
-
-	case "$pager" in
-		cat)
-			pagercmd=(cat)
-			;;
-		less)
-			pagercmd=(less)
-			;;
-		""|bat)
-			pagercmd=(bat --style plain --paging always)
-			;;
-		glow)
-			pagercmd=(glow --pager)
-			;;
-		*)
-			perror "$pager: Invalid pager"
-			exit 1
-			;;
-	esac
 
 	for i in "${dates[@]}"; do
 		f="$datadir/${i:0:4}/${i:4:2}/${i:6:2}.md"
@@ -358,7 +331,7 @@ sc_restore() {
 		read -er -p "[S]ee the backup file, [R]estore it, or [E]xit? [E] " answer
 		case "$answer" in
 			s|S)
-				less "$datadir/backup/$f.md"
+				"${pagercmd[@]}" "$datadir/backup/$f.md"
 				break
 				;;
 			r|R)
@@ -373,8 +346,9 @@ sc_restore() {
 # MAIN
 
 main() {
-	local i subcmd
+	local i subcmd pager
 	declare progname datadir ed tmp
+	declare -a pagercmd
 
 	progname=nikki
 	datadir="${XDG_DATA_HOME:-$HOME/.local/share}/$progname"
@@ -396,6 +370,14 @@ main() {
 			-h|--help)
 				usage
 				exit
+				;;
+			-p|--pager)
+				shift
+				if [ $# -eq 0 ]; then
+					usage_cat
+					exit 1
+				fi
+				pager="$1"
 				;;
 			-*)
 				perror "Invalid option: $1"
@@ -427,6 +409,25 @@ main() {
 		shift
 	done
 	shift
+
+	case "$pager" in
+		cat)
+			pagercmd=(cat)
+			;;
+		less)
+			pagercmd=(less)
+			;;
+		""|bat)
+			pagercmd=(bat --style plain --paging always)
+			;;
+		glow)
+			pagercmd=(glow --pager)
+			;;
+		*)
+			perror "$pager: Invalid pager"
+			exit 1
+			;;
+	esac
 
 	rmoldcache
 
