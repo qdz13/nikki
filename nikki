@@ -112,7 +112,7 @@ sc_edit() {
 		"$editor" "$tmp"
 
 		if [ -e "$f" ]; then
-			cmp -s <(sed 1,4d "$tmp") "$f" && return
+			cmp -s <(sed 1,4d "$f") "$tmp" && return
 			cp "$f" "$datadir/backup/${fname//\//}.md"
 		else
 			[ -s "$tmp" ] || return
