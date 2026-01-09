@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=SC2015,SC2209
+# shellcheck disable=SC2015,SC2086,SC2207,SC2209
 
 # FUNCTIONS
 
@@ -14,6 +14,8 @@ usage() {
 	  edit
 	  ls
 	  cat
+	  tree
+	  restore
 
 	EOF
 	echo "To see the usage of each commands, run \`$progname command -h\`"
@@ -21,6 +23,10 @@ usage() {
 
 perror() {
 	echo "$progname:" "$@" >&2
+}
+
+rmoldcache() {
+	[ -d "$datadir/backup" ] && find "$datadir/backup" -type f -mtime +3 -delete
 }
 
 cleanup() {
@@ -82,6 +88,7 @@ sc_edit() {
 
 	maketmp
 
+	mkdir -p "$datadir/backup"
 	for i in "${dates[@]}"; do
 		fname="${i:0:4}/${i:4:2}/${i:6:2}"
 		f="$datadir/$fname.md"
@@ -106,10 +113,6 @@ sc_edit() {
 		else
 			[ -s "$tmp" ] || return
 		fi
-
-		[ -d "$datadir/backup" ] &&
-			find "$datadir/backup" -type f -not -name "${fname//\//}.md" -delete ||
-			mkdir "$datadir/backup"
 
 		{
 			printf -- "---\ndate: %s\n---\n\n" "$fname"
@@ -290,6 +293,81 @@ sc_tree() {
 	}| less
 }
 
+usage_restore() {
+	echo "Usage: $progname restore [-h]" >&2
+	cat >&2 <<-'EOF'
+
+	Options:
+	  -h, --help    Display this help message and exit
+	EOF
+}
+
+sc_restore() {
+	local answer i f
+	local -a files
+
+	while [ $# -ne 0 ]; do
+		case "$1" in
+			-h|--help)
+				usage_restore
+				exit
+				;;
+			-*)
+				perror "Invalid option: $1"
+				usage_restore
+				exit 1
+				;;
+			*)
+				usage_restore
+				exit 1
+				;;
+		esac
+	done
+
+	if ! [ -e "$datadir/backup" ]; then
+		perror "Couldn't find any backup file"
+		exit 1
+	fi
+
+	files=($(find "$datadir/backup" -type f -print 2>/dev/null | sed -e "s|^$datadir/backup/||g" -e 's/\.md$//g' | sort -nr))
+	if [ ${#files[@]} -eq 0 ]; then
+		perror "Couldn't find any backup file"
+		exit 1
+	elif [ ${#files[@]} -eq 1 ]; then
+		f="${files[0]}"
+	else
+		for i in $(seq ${#files[@]}); do
+			printf "[%d] %d\n" $i ${files[i-1]}
+		done
+		read -er -p "Enter a number: " answer
+		if ! [[ $answer =~ ^[0-9]*$ ]]; then
+			perror "$answer: Not a number"
+			exit 1
+		fi
+		if [ $answer -gt ${#files[@]} ] || ((answer == 0)); then
+			perror "$answer: Invalid number"
+			exit 1
+		fi
+		f="${files[answer-1]}"
+	fi
+
+	echo "$f is selected"
+	while :; do
+		read -er -p "[S]ee the backup file, [R]estore it, or [E]xit? [E] " answer
+		case "$answer" in
+			s|S)
+				less "$datadir/backup/$f.md"
+				break
+				;;
+			r|R)
+				mv "$datadir/backup/$f.md" "$datadir/${f:0:4}/${f:4:2}/${f:6:2}.md"
+				break
+				;;
+			""|e|E) exit ;;
+		esac
+	done
+}
+
 # MAIN
 
 main() {
@@ -335,6 +413,10 @@ main() {
 				subcmd=tree
 				break
 				;;
+			restore)
+				subcmd=restore
+				break
+				;;
 			*)
 				usage
 				exit 1
@@ -344,11 +426,14 @@ main() {
 	done
 	shift
 
+	rmoldcache
+
 	case "$subcmd" in
 		edit) sc_edit "$@" ;;
 		ls) sc_ls "$@" ;;
 		cat) sc_cat "$@" ;;
 		tree) sc_tree "$@" ;;
+		restore) sc_restore "$@" ;;
 	esac
 
 	cleanup
