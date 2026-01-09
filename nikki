@@ -1,0 +1,359 @@
+#!/bin/bash
+# shellcheck disable=SC2015,SC2209
+
+# FUNCTIONS
+
+usage() {
+	echo "Usage: $progname [-h] [command] [options]" >&2
+	cat >&2 <<-'EOF'
+
+	Global options:
+	  -h, --help  Display this help message and exit
+
+	Commands:
+	  edit
+	  ls
+	  cat
+
+	EOF
+	echo "To see the usage of each commands, run \`$progname command -h\`"
+}
+
+perror() {
+	echo "$progname:" "$@" >&2
+}
+
+cleanup() {
+	[ -n "$tmp" ] && rm -f "$tmp"
+}
+
+maketmp() {
+	tmp=$(mktemp)
+	trap 'cleanup' HUP INT QUIT PIPE TERM
+}
+
+# SUBCOMMANDS
+
+usage_edit() {
+	echo "Usage: $progname edit [-hp] [[[yyyy]mm]dd ...]" >&2
+	cat >&2 <<-'EOF'
+
+	Options:
+	  -h, --help  Display this help message and exit
+	  -p, --past  Edit past diary
+	EOF
+}
+
+sc_edit() {
+	local i past old fname f
+	local -a dates
+
+	past=false
+	old=false
+	while [ $# -ne 0 ]; do
+		case "$1" in
+			-h|--help)
+				usage_edit
+				exit
+				;;
+			-p|--past) past=true ;;
+			-*)
+				perror "Invalid option: $1"
+				usage_edit
+				exit 1
+				;;
+			*)
+				if [[ $1 =~ ^[0-9]{2}$ ]]; then
+					dates+=("$(date '+%Y%m')$1")
+				elif [[ $1 =~ ^[0-9]{4}$ ]]; then
+					dates+=("$(date '+%Y')$1")
+				elif [[ $1 =~ ^[0-9]{8}$ ]]; then
+					dates+=("$1")
+				else
+					usage_edit
+					exit 1
+				fi
+				old=true
+				;;
+		esac
+		shift
+	done
+	[ ${#dates[@]} -eq 0 ] && dates+=("$(date '+%Y%m%d')")
+
+	maketmp
+
+	for i in "${dates[@]}"; do
+		fname="${i:0:4}/${i:4:2}/${i:6:2}"
+		f="$datadir/$fname.md"
+		if [ "$old" = true ]; then
+			if [ "$past" = false ]; then
+				perror "Use -p to edit past diaries"
+				usage_edit
+				exit 1
+			elif ! [ -e "$f" ]; then
+				perror "$fname: No such diary"
+				exit 1
+			fi
+		fi
+		mkdir -p "${f%/*}"
+		[ -e "$f" ] && sed 1,4d "$f" > "$tmp"
+
+		"$ed" "$tmp"
+
+		if [ -e "$f" ]; then
+			cmp -s <(sed 1,4d "$tmp") "$f" && return
+			cp "$f" "$datadir/backup/${fname//\//}.md"
+		else
+			[ -s "$tmp" ] || return
+		fi
+
+		[ -d "$datadir/backup" ] &&
+			find "$datadir/backup" -type f -not -name "${fname//\//}.md" -delete ||
+			mkdir "$datadir/backup"
+
+		{
+			printf -- "---\ndate: %s\n---\n\n" "$fname"
+			cat "$tmp"
+		} > "$f"
+	done
+}
+
+usage_ls() {
+	echo "Usage: $progname ls [-h] [[yyyy]mm ...]" >&2
+	cat >&2 <<-'EOF'
+
+	Options:
+	  -h, --help    Display this help message and exit
+	EOF
+}
+
+sc_ls() {
+	local i month
+	local -a dirs
+
+	while [ $# -ne 0 ]; do
+		case "$1" in
+			-h|--help)
+				usage_ls
+				exit
+				;;
+			-*)
+				perror "Invalid option: $1"
+				usage_ls
+				exit 1
+				;;
+			*)
+				if [[ $1 =~ ^[0-9]{2}$ ]]; then
+					dirs+=("$(date '+%Y')/$1")
+					month=true
+				elif [[ $1 =~ ^[0-9]{4}$ ]]; then
+					dirs+=("$1")
+					month=false
+				elif [[ $1 =~ ^[0-9]{6}$ ]]; then
+					dirs+=("${1:0:4}/${1:4:2}")
+					month=true
+				else
+					usage_ls
+					exit 1
+				fi
+				;;
+		esac
+		shift
+	done
+	if [ ${#dirs[@]} -eq 0 ]; then
+		dirs+=("$(date '+%Y')")
+		month=false
+	fi
+
+	for i in "${dirs[@]}"; do
+		[ -d "$datadir/$i" ] || continue
+		{
+			if [ "$month" = true ]; then
+				find "$datadir/$i" -not -name "$i" -type f -maxdepth 1 -print
+			else
+				find "$datadir/$i" -not -name "$i" -type d -maxdepth 1 -print
+			fi
+		} | sed -e "s|^$datadir/||" -e 's|/||g' -e 's/\.md$//'
+	done
+}
+
+usage_cat() {
+	echo "Usage: $progname cat [-hp] [[[yyyy]mm]dd ...]" >&2
+	cat >&2 <<-'EOF'
+
+	Options:
+	  -h, --help    Display this help message and exit
+	  -p, --pager   Set pager (cat, less, bat, glow)
+	EOF
+}
+
+sc_cat() {
+	local pager i f
+	local -a pagercmd dates
+
+	while [ $# -ne 0 ]; do
+		case "$1" in
+			-h|--help)
+				usage_cat
+				exit
+				;;
+			-p|--pager)
+				shift
+				if [ $# -eq 0 ]; then
+					usage_cat
+					exit 1
+				fi
+				pager="$1"
+				;;
+			-*)
+				perror "Invalid option: $1"
+				usage_cat
+				exit 1
+				;;
+			*)
+				if [[ $1 =~ ^[0-9]{2}$ ]]; then
+					dates+=("$(date '+%Y%m')$1")
+				elif [[ $1 =~ ^[0-9]{4}$ ]]; then
+					dates+=("$(date '+%Y')$1")
+				elif [[ $1 =~ ^[0-9]{8}$ ]]; then
+					dates+=("$1")
+				else
+					usage_edit
+					exit 1
+				fi
+				;;
+		esac
+		shift
+	done
+	[ ${#dates[@]} -eq 0 ] && dates+=("$(date '+%Y%m%d')")
+
+	case "$pager" in
+		cat)
+			pagercmd=(cat)
+			;;
+		less)
+			pagercmd=(less)
+			;;
+		""|bat)
+			pagercmd=(bat --style plain --paging always)
+			;;
+		glow)
+			pagercmd=(glow --pager)
+			;;
+		*)
+			perror "$pager: Invalid pager"
+			exit 1
+			;;
+	esac
+
+	for i in "${dates[@]}"; do
+		f="$datadir/${i:0:4}/${i:4:2}/${i:6:2}.md"
+		if ! [ -e "$f" ]; then
+			perror "$f: No such file"
+			continue
+		fi
+		"${pagercmd[@]}" "$f"
+	done
+}
+
+usage_tree() {
+	echo "Usage: $progname tree [-h]" >&2
+	cat >&2 <<-'EOF'
+
+	Options:
+	  -h, --help    Display this help message and exit
+	EOF
+}
+
+sc_tree() {
+	while [ $# -ne 0 ]; do
+		case "$1" in
+			-h|--help)
+				usage_tree
+				exit
+				;;
+			-*)
+				perror "Invalid option: $1"
+				usage_tree
+				exit 1
+				;;
+			*)
+				usage_tree
+				exit 1
+				;;
+		esac
+	done
+
+	{
+		printf "\033[34m\033[1m%s\033[0m\n" "$progname"
+		tree -C -I backup "$datadir" | sed '1d'
+	}| less
+}
+
+# MAIN
+
+main() {
+	local i subcmd
+	declare progname datadir ed tmp
+
+	progname=nikki
+	datadir="${XDG_DATA_HOME:-$HOME/.local/share}/$progname"
+	[ -d "$datadir" ] || mkdir -p "$datadir"
+	for i in "$EDITOR" "$VISUAL" nvim vim nvi vi; do
+		if [ -n "$i" ]; then
+			ed="$i"
+			break
+		fi
+	done
+	if [ -z "$ed" ]; then
+		perror "Failed to set the editor"
+		exit 1
+	fi
+
+	subcmd=edit
+	while [ $# -ne 0 ]; do
+		case "$1" in
+			-h|--help)
+				usage
+				exit
+				;;
+			-*)
+				perror "Invalid option: $1"
+				usage
+				exit 1
+				;;
+			edit) break ;;
+			ls)
+				subcmd=ls
+				break
+				;;
+			cat)
+				subcmd=cat
+				break
+				;;
+			tree)
+				subcmd=tree
+				break
+				;;
+			*)
+				usage
+				exit 1
+				;;
+		esac
+		shift
+	done
+	shift
+
+	case "$subcmd" in
+		edit) sc_edit "$@" ;;
+		ls) sc_ls "$@" ;;
+		cat) sc_cat "$@" ;;
+		tree) sc_tree "$@" ;;
+	esac
+
+	cleanup
+
+	return 0
+}
+
+main "$@"
