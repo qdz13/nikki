@@ -19,7 +19,7 @@ usage() {
 	  restore
 
 	EOF
-	echo "To see the usage of each commands, run \`$progname command -h\`"
+	echo "To see the usage of each commands, run \`$progname [command] -h\`"
 }
 
 perror() {
