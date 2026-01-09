@@ -8,8 +8,8 @@ usage() {
 	cat >&2 <<-'EOF'
 
 	Global options:
-	  -h, --help   Display this help message and exit
-	  -p, --pager  Set pager (cat, less, bat (default), glow)
+	  -h, --help     Display this help message and exit
+	  -p, --pager    Set pager (cat, less, bat (default), glow)
 
 	Commands:
 	  edit
