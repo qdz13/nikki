@@ -1,6 +1,6 @@
 # nikki
 
-nikki is a command-line diary manager written in Bash.
+`nikki` is a command-line diary manager written in Bash.
 
 ## Features
 
@@ -20,7 +20,7 @@ nikki is a command-line diary manager written in Bash.
 
 You should also set `EDITOR` or `VISUAL` environment variable.
 
-Note that nikki does not check if these commands are installed!
+Note that `nikki` does not check if these commands are installed!
 
 ## Usage
 
