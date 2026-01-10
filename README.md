@@ -6,7 +6,7 @@ nikki is a command-line diary manager written in Bash.
 
 * [Bash](https://www.gnu.org/software/bash/) (Bash included with macOS is old, but it's enough.)
 * [less](https://www.greenwoodsoftware.com/less/index.html)
-* [Tree](https://gitlab.com/OldManProgrammer/unix-tree)
+* [Tree](https://oldmanprogrammer.net/source.php?dir=projects/tree)
 * [Git](https://git-scm.com/)
 * [diff-highlight](https://github.com/git/git/tree/master/contrib/diff-highlight)
 * [bat](https://github.com/sharkdp/bat)
