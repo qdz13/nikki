@@ -20,7 +20,7 @@ usage() {
 	  tree
 	  restore
 
-	If no arguments are provided, \`$progname [command] -h\` will be perfomed.
+	If no arguments are provided, \`$progname edit\` will be perfomed.
 	To see the usage of each commands, run \`$progname [command] -h\`
 	EOF
 }
@@ -53,6 +53,8 @@ usage_edit() {
 	Options:
 	  -h, --help  Display this help message and exit
 	  -p, --past  Edit past diary
+
+	If no arguments are provided, the diary of current date will be opened.
 	EOF
 }
 
@@ -193,6 +195,8 @@ usage_read() {
 
 	Options:
 	  -h, --help    Display this help message and exit
+
+	If no arguments are provided, the diary of current date will be shown.
 	EOF
 }
 
