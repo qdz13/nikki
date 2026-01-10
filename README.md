@@ -2,6 +2,12 @@
 
 nikki is a command-line diary manager written in Bash.
 
+## Features
+
+* Single shell script
+* Markdown format
+* Read, write, restore, or remove diaries easily
+
 ## Requirements
 
 * [Bash](https://www.gnu.org/software/bash/) (Bash included with macOS is old, but it's enough.)
