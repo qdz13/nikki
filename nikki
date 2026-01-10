@@ -387,9 +387,11 @@ sc_restore() {
 
 	echo "$f is selected"
 	while :; do
-		read -er -p "[S]ee the backup file, [R]estore it, or [E]xit? [E] " answer
+		read -er -p "[S]ee the backup file, check the [D]ifference, [R]estore it, or [E]xit? [E] " answer
 		case "$answer" in
 			s|S) "${pagercmd[@]}" "$datadir/backup/$f.md" ;;
+			d|D) git diff --color=always "$datadir/${f:0:4}/${f:4:2}/${f:6:2}.md" "$datadir/backup/$f.md" |
+				 sed 1,4d | diff-highlight | less ;;
 			r|R)
 				mv "$datadir/backup/$f.md" "$datadir/${f:0:4}/${f:4:2}/${f:6:2}.md"
 				break
