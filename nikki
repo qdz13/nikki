@@ -4,8 +4,9 @@
 # FUNCTIONS
 
 usage() {
-	echo "Usage: $progname [-h] [-p pager] [command] [options]" >&2
-	cat >&2 <<-'EOF'
+	cat >&2 <<-EOF
+	Usage: $progname [-h] [-p pager] [command] [options]
+	       $progname
 
 	Global options:
 	  -h, --help     Display this help message and exit
@@ -19,8 +20,9 @@ usage() {
 	  tree
 	  restore
 
+	If no arguments are provided, \`$progname [command] -h\` will be perfomed.
+	To see the usage of each commands, run \`$progname [command] -h\`
 	EOF
-	echo "To see the usage of each commands, run \`$progname [command] -h\`"
 }
 
 perror() {
@@ -45,8 +47,8 @@ maketmp() {
 # SUBCOMMANDS
 
 usage_edit() {
-	echo "Usage: $progname edit [-hp] [[[yyyy]mm]dd ...]" >&2
-	cat >&2 <<-'EOF'
+	cat >&2 <<-EOF
+	Usage: $progname edit [-hp] [[[yyyy]mm]dd ...]
 
 	Options:
 	  -h, --help  Display this help message and exit
@@ -126,8 +128,8 @@ sc_edit() {
 }
 
 usage_ls() {
-	echo "Usage: $progname ls [-h] [[yyyy]mm ...]" >&2
-	cat >&2 <<-'EOF'
+	cat >&2 <<-EOF
+	Usage: $progname ls [-h] [[yyyy]mm ...]
 
 	Options:
 	  -h, --help    Display this help message and exit
@@ -186,8 +188,8 @@ sc_ls() {
 }
 
 usage_read() {
-	echo "Usage: $progname read [-h] [[[yyyy]mm]dd ...]" >&2
-	cat >&2 <<-'EOF'
+	cat >&2 <<-EOF
+	Usage: $progname read [-h] [[[yyyy]mm]dd ...]
 
 	Options:
 	  -h, --help    Display this help message and exit
@@ -237,8 +239,8 @@ sc_read() {
 }
 
 usage_rm() {
-	echo "Usage: $progname rm [-h] [[[yyyy]mm]dd ...]" >&2
-	cat >&2 <<-'EOF'
+	cat >&2 <<-EOF
+	Usage: $progname rm [-h] [[[yyyy]mm]dd ...]
 
 	Options:
 	  -h, --help    Display this help message and exit
@@ -293,8 +295,8 @@ sc_rm() {
 }
 
 usage_tree() {
-	echo "Usage: $progname tree [-h]" >&2
-	cat >&2 <<-'EOF'
+	cat >&2 <<-EOF
+	Usage: $progname tree [-h]
 
 	Options:
 	  -h, --help    Display this help message and exit
@@ -327,8 +329,8 @@ sc_tree() {
 }
 
 usage_restore() {
-	echo "Usage: $progname restore [-h]" >&2
-	cat >&2 <<-'EOF'
+	cat >&2 <<-EOF
+	Usage: $progname restore [-h]
 
 	Options:
 	  -h, --help    Display this help message and exit
