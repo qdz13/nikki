@@ -13,12 +13,12 @@ usage() {
 	      --pager    Set pager (cat, less, bat (default), glow)
 
 	Commands:
-	  edit
-	  ls
-	  read
-	  rm
-	  tree
-	  restore
+	  edit       Edit diaries
+	  ls         List diaries
+	  read       Read diaries
+	  rm         Remove diaries
+	  tree       List diaries in a tree-like format
+	  restore    Restore diaries
 
 	If no arguments are provided, \`$progname edit\` will be perfomed.
 	To see the usage of each commands, run \`$progname [command] -h\`
@@ -52,7 +52,7 @@ usage_edit() {
 
 	Options:
 	  -h, --help  Display this help message and exit
-	  -p, --past  Edit past diary
+	  -p, --past  Edit past diaries
 
 	If no arguments are provided, the diary of current date will be opened.
 	EOF

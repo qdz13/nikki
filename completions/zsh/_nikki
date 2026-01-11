@@ -57,18 +57,18 @@ _nikki() {
 
 	if [ "$state" = cmd ]; then
 		_values 'subcommand' \
-			'edit[Edit diary]' \
+			'edit[Edit diaries]' \
 			'ls[List diaries]' \
-			'read[Read diary]' \
-			'rm[Remove diary]' \
+			'read[Read diaries]' \
+			'rm[Remove diaries]' \
 			'tree[List diaries in a tree-like format]' \
-			'restore[Restore diary]'
+			'restore[Restore diaries]'
 	else
 		case "${words[1]}" in
 			edit)
 				_arguments \
 					'(- *)'{-h,--help}'[Display help message and exit]' \
-					'(-p --past)'{-p,--past}'[Edit past diary]' && ret=0
+					'(-p --past)'{-p,--past}'[Edit past diaries]' && ret=0
 
 				past=false
 				for i in $(seq ${#words[@]}); do
