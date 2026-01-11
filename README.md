@@ -5,6 +5,7 @@
 ## Features
 
 * Single shell script
+* Powerful Zsh completion
 * Markdown format
 * Read, write, restore, or remove diaries easily
 
