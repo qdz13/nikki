@@ -5,7 +5,7 @@
 
 usage() {
 	cat >&2 <<-EOF
-	Usage: $progname [-h] [-p pager] [command] [options]
+	Usage: $progname [-h] [-p pager] <command> [options]
 	       $progname
 
 	Global options:
