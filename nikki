@@ -21,7 +21,7 @@ usage() {
 	  restore    Restore diaries
 
 	If no arguments are provided, \`$progname edit\` will be perfomed.
-	To see the usage of each commands, run \`$progname [command] -h\`
+	To see the usage of each commands, run \`$progname <command> -h\`
 	EOF
 }
 
