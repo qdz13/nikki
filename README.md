@@ -23,6 +23,12 @@ You should also set `EDITOR` or `VISUAL` environment variable.
 
 Note that `nikki` does not check if these commands are installed!
 
+## Installation
+
+```sh
+sudo make install
+```
+
 ## Usage
 
 ```sh
