@@ -10,7 +10,7 @@ usage() {
 
 	Global options:
 	  -h, --help     Display this help message and exit
-	  -p, --pager    Set pager (cat, less, bat (default), glow)
+	      --pager    Set pager (cat, less, bat (default), glow)
 
 	Commands:
 	  edit
@@ -97,10 +97,9 @@ sc_edit() {
 
 	maketmp
 
-	mkdir -p "$datadir/backup"
 	for i in "${dates[@]}"; do
 		fname="${i:0:4}/${i:4:2}/${i:6:2}"
-		f="$datadir/$fname.md"
+		f="$datadir/diaries/$fname.md"
 		if [ "$old" = true ]; then
 			if [ "$past" = false ]; then
 				perror "Use -p to edit past diaries"
@@ -173,20 +172,20 @@ sc_ls() {
 		shift
 	done
 	if [ ${#dirs[@]} -eq 0 ]; then
-		find "$datadir" -not -name "$progname" -not -name backup -type d -maxdepth 1 -print |
-			sed  -e "s|^$datadir/||" -e 's|/||g' -e 's/\.md$//' | sort -n
+		find "$datadir/diaries" -type d -maxdepth 1 -not -name diaries -print |
+			sed  -e "s|^$datadir/diaries/||" -e 's|/||g' -e 's/\.md$//' | sort -n
 		exit
 	fi
 
 	for i in "${dirs[@]}"; do
-		[ -d "$datadir/$i" ] || continue
+		[ -d "$datadir/diaries/$i" ] || continue
 		{
 			if [ "$month" = true ]; then
-				find "$datadir/$i" -not -name "$i" -type f -maxdepth 1 -print
+				find "$datadir/diaries/$i" -not -name "$i" -type f -maxdepth 1 -print
 			else
-				find "$datadir/$i" -not -name "$i" -type d -maxdepth 1 -print
+				find "$datadir/diaries/$i" -not -name "$i" -type d -maxdepth 1 -print
 			fi
-		} | sed -e "s|^$datadir/||" -e 's|/||g' -e 's/\.md$//' | sort -n
+		} | sed -e "s|^$datadir/diaries/||" -e 's|/||g' -e 's/\.md$//' | sort -n
 	done
 }
 
@@ -234,7 +233,7 @@ sc_read() {
 	[ ${#dates[@]} -eq 0 ] && dates+=("$(date '+%Y%m%d')")
 
 	for i in "${dates[@]}"; do
-		f="$datadir/${i:0:4}/${i:4:2}/${i:6:2}.md"
+		f="$datadir/diaries/${i:0:4}/${i:4:2}/${i:6:2}.md"
 		if ! [ -e "$f" ]; then
 			perror "$i: No such diary"
 			continue
@@ -290,11 +289,11 @@ sc_rm() {
 
 	for i in "${dates[@]}"; do
 		f="${i:0:4}/${i:4:2}/${i:6:2}.md"
-		if ! [ -e "$datadir/$f" ]; then
+		if ! [ -e "$datadir/diaries/$f" ]; then
 			perror "$i: No such diary"
 			continue
 		fi
-		mv "$datadir/$f" "$datadir/backup/$i.md"
+		mv "$datadir/diaries/$f" "$datadir/backup/$i.md"
 		echo "Removed $i"
 	done
 }
@@ -329,7 +328,7 @@ sc_tree() {
 
 	{
 		printf "\033[34m\033[1m%s\033[0m\n" "$progname"
-		tree -C -I backup "$datadir" | sed '1d'
+		tree -C "$datadir/diaries" | sed '1d'
 	} | less
 }
 
@@ -397,10 +396,10 @@ sc_restore() {
 		read -er -p "[S]ee the backup file, check the [D]ifference, [R]estore it, or [E]xit? [E] " answer
 		case "$answer" in
 			s|S) "${pagercmd[@]}" "$datadir/backup/$f.md" ;;
-			d|D) git diff --color=always "$datadir/${f:0:4}/${f:4:2}/${f:6:2}.md" "$datadir/backup/$f.md" |
+			d|D) git diff --color=always "$datadir/diaries/${f:0:4}/${f:4:2}/${f:6:2}.md" "$datadir/backup/$f.md" |
 				 sed 1,4d | diff-highlight | less ;;
 			r|R)
-				mv "$datadir/backup/$f.md" "$datadir/${f:0:4}/${f:4:2}/${f:6:2}.md"
+				mv "$datadir/backup/$f.md" "$datadir/diaries/${f:0:4}/${f:4:2}/${f:6:2}.md"
 				break
 				;;
 			""|e|E) exit ;;
@@ -417,7 +416,7 @@ main() {
 
 	progname=nikki
 	datadir="${XDG_DATA_HOME:-$HOME/.local/share}/$progname"
-	[ -d "$datadir" ] || mkdir -p "$datadir"
+	mkdir -p "$datadir" "$datadir/diaries" "$datadir/backup"
 	#shellcheck disable=SC2153
 	editor="${EDITOR:-$VISUAL}"
 	if [ -z "$editor" ]; then
@@ -432,7 +431,7 @@ main() {
 				usage
 				exit
 				;;
-			-p|--pager)
+			--pager)
 				shift
 				if [ $# -eq 0 ]; then
 					usage_read

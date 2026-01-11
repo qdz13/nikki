@@ -6,10 +6,10 @@ _nikki_diaries() {
 
 	[ $# -eq 1 ] || return
 	datadir="$1"
-	[ -d "$datadir" ] || return
+	[ -d "$datadir/diaries" ] || return
 
-	dates=($(find "$datadir" -name backup -prune -o -type f -name '*.md' -print |
-			 sed -e "s|^$datadir/||g" -e 's/\.md$//g' -e 's|/||g'))
+	dates=($(find "$datadir/diaries" -type f -name '*.md' -print |
+			 sed -e "s|^$datadir/diaries/||g" -e 's/\.md$//g' -e 's|/||g'))
 	[ ${#dates[@]} -eq 0 ] && return
 
 	i=$(tr ' ' '\n' <<<  "${dates[@]}")
@@ -21,20 +21,21 @@ _nikki_diaries() {
 }
 
 _nikki() {
+	local context state state_descr line
+	typeset -A opt_args
+
 	local datadir past
 	local -a dates
 
 	datadir="${XDG_DATA_HOME:-$HOME/.local/share}/nikki"
 
 	_arguments \
+		'(- *)'{-h,--help}'[Display help message and exit]' \
+		'(--pager)--pager[Set pager]:pager:(cat less bat glow)' \
 		'1: :->cmd' \
 		'*:: :->arg' && ret=0
 
 	if [ "$state" = cmd ]; then
-		_arguments \
-			'(- *)'{-h,--help}'[Display help message and exit]' \
-			'(-p --pager)'{-p,--pager}'[Set pager]:pager:(cat less bat glow)' && ret=0
-
 		_values 'subcommand' \
 			'edit[Edit diary]' \
 			'ls[List diaries]' \
@@ -49,37 +50,37 @@ _nikki() {
 					'(- *)'{-h,--help}'[Display help message and exit]' \
 					'(-p --past)'{-p,--past}'[Edit past diary]' && ret=0
 
-				if [ -d "$datadir" ]; then
-					past=false
-					for i in $(seq ${#words[@]}); do
-						if [ "${words[i]}" = -p ] || [ "${words[i]}" = --past ]; then
-							past=true
-							break
-						fi
-					done
-
-					if [ "$past" = true ]; then
-						_nikki_diaries "$datadir"
-					else
-						_values diary $(date '+%Y%m%d %m%d %d')
+				past=false
+				for i in $(seq ${#words[@]}); do
+					if [ "${words[i]}" = -p ] || [ "${words[i]}" = --past ]; then
+						past=true
+						break
 					fi
+				done
+
+				if [ "$past" = true ]; then
+					_nikki_diaries "$datadir"
+				else
+					_values diary $(date '+%Y%m%d %m%d %d')
 				fi
 				;;
 			ls)
 				_arguments \
 					'(- *)'{-h,--help}'[Display help message and exit]' && ret=0
 
-				dates=($(find "$datadir" -type d -not \( -name nikki -or -name backup \) -print |
-						 sed -e "s|^$datadir/||g" -e 's|/||g'))
+				[ -d "$datadir/diaries" ] || return
+
+				dates=($(find "$datadir/diaries" -not -name diaries -type d -print |
+						 sed -e "s|^$datadir/diaries/||g" -e 's|/||g'))
 				[ ${#dates[@]} -eq 0 ] && return
 
-				[ -d "$datadir" ] && _values 'date' $dates
+				_values 'date' $dates
 				;;
 			read|rm)
 				_arguments \
 					'(- *)'{-h,--help}'[Display help message and exit]' && ret=0
 
-				[ -d "$datadir" ] && _nikki_diaries "$datadir"
+				_nikki_diaries "$datadir"
 				;;
 			tree|restore) _arguments '(- *)'{-h,--help}'[Display help message and exit]' && ret=0 ;;
 		esac
