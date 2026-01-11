@@ -131,7 +131,8 @@ sc_edit() {
 
 usage_ls() {
 	cat >&2 <<-EOF
-	Usage: $progname ls [-h] [[yyyy]mm ...]
+	Usage: $progname ls [-h] [yyyy[mm] ...]
+	                         [mm ...]
 
 	Options:
 	  -h, --help    Display this help message and exit
