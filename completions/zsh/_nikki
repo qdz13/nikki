@@ -1,5 +1,25 @@
 #compdef nikki
 
+_nikki_ls() {
+	local i datadir
+	local -a dates files
+
+	[ $# -eq 1 ] || return
+	datadir="$1"
+	[ -d "$datadir/diaries" ] || return
+
+	dates=($(find "$datadir/diaries" -type f -name '*.md' -print |
+			 sed -e "s|^$datadir/diaries/||g" -e 's/\.md$//g' -e 's|/||g'))
+	[ ${#dates[@]} -eq 0 ] && return
+
+	i=$(tr ' ' '\n' <<<  "${dates[@]}")
+	files+=($(sed 's/.\{2\}$//g' <<< "$i")) # %Y
+	files+=($(sed 's/.\{4\}$//g' <<< "$i")) # %Y%m
+	files+=($(grep -q "^$(date '+%Y%m')" <<< "$i" && date '+%m')) # Current month
+
+	_values 'diary' $files
+}
+
 _nikki_diaries() {
 	local i datadir
 	local -a dates files
@@ -14,8 +34,8 @@ _nikki_diaries() {
 
 	i=$(tr ' ' '\n' <<<  "${dates[@]}")
 	files+=("${dates[@]}")
-	files+=($(sed -n "/^$(date '+%Y')/"'s/^.\{4\}//p' <<< "$i")) # Current year
-	files+=($(sed -n "/^$(date '+%Y%m')/"'s/^.\{6\}//p' <<< "$i")) # Current month
+	files+=($(sed -n "/^$(date '+%Y')/"'s/^.\{4\}//p' <<< "$i")) # Current month
+	files+=($(sed -n "/^$(date '+%Y%m')/"'s/^.\{6\}//p' <<< "$i")) # Current date
 
 	_values 'diary' $files
 }
@@ -68,13 +88,7 @@ _nikki() {
 				_arguments \
 					'(- *)'{-h,--help}'[Display help message and exit]' && ret=0
 
-				[ -d "$datadir/diaries" ] || return
-
-				dates=($(find "$datadir/diaries" -not -name diaries -type d -print |
-						 sed -e "s|^$datadir/diaries/||g" -e 's|/||g'))
-				[ ${#dates[@]} -eq 0 ] && return
-
-				_values 'date' $dates
+				_nikki_ls "$datadir"
 				;;
 			read|rm)
 				_arguments \
