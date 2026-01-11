@@ -81,13 +81,14 @@ sc_edit() {
 					dates+=("$(date '+%Y%m')$1")
 				elif [[ $1 =~ ^[0-9]{4}$ ]]; then
 					dates+=("$(date '+%Y')$1")
+					[ $1 = "$(date '+%m%d')" ] || old=true
 				elif [[ $1 =~ ^[0-9]{8}$ ]]; then
 					dates+=("$1")
+					[ $1 = "$(date '+%Y%m%d')" ] || old=true
 				else
 					usage_edit
 					exit 1
 				fi
-				old=true
 				;;
 		esac
 		shift
