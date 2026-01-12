@@ -36,7 +36,7 @@ brew install tree git bat glow
 ln -s /opt/homebrew/share/git-core/contrib/diff-highlight/diff-highlight "${XDG_BIN_HOME:-$HOME/.local/bin}"
 ```
 
-### Pacman (Arch-based distributions)
+### Pacman (Arch-based Linux distributions)
 
 ```sh
 sudo pacman -Syu
