@@ -404,7 +404,7 @@ sc_restore() {
 				mv "$datadir/backup/$f.md" "$datadir/diaries/${f:0:4}/${f:4:2}/${f:6:2}.md"
 				break
 				;;
-			e|E) exit ;;
+			""|e|E) exit ;;
 		esac
 	done
 }
