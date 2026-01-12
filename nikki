@@ -380,7 +380,9 @@ sc_restore() {
 			printf "[%d] %d\n" $i ${files[i-1]}
 		done
 		read -er -p "Enter a number: " answer
-		if ! [[ $answer =~ ^[0-9]*$ ]]; then
+		if [ -z "$answer" ]; then
+			exit
+		elif ! [[ $answer =~ ^[0-9]+$ ]]; then
 			perror "$answer: Not a number"
 			exit 1
 		fi
@@ -402,7 +404,7 @@ sc_restore() {
 				mv "$datadir/backup/$f.md" "$datadir/diaries/${f:0:4}/${f:4:2}/${f:6:2}.md"
 				break
 				;;
-			""|e|E) exit ;;
+			e|E) exit ;;
 		esac
 	done
 }
