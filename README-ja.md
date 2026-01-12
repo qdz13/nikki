@@ -31,7 +31,7 @@
 ### Homebrew (macOS)
 
 ```sh
-brew up
+brew update
 brew install tree git bat glow
 ln -s /opt/homebrew/share/git-core/contrib/diff-highlight/diff-highlight "${XDG_BIN_HOME:-$HOME/.local/bin}"
 ```
@@ -40,7 +40,7 @@ ln -s /opt/homebrew/share/git-core/contrib/diff-highlight/diff-highlight "${XDG_
 
 ```sh
 sudo pacman -Syu
-sudo pacman -S tree git bat glow
+sudo pacman -S less tree git bat glow
 ln -s /usr/share/git/diff-highlight/diff-highlight "${XDG_BIN_HOME:-$HOME/.local/bin}"
 ```
 
@@ -48,7 +48,7 @@ ln -s /usr/share/git/diff-highlight/diff-highlight "${XDG_BIN_HOME:-$HOME/.local
 
 ```sh
 doas pkg update
-doas pkg install bash tree git bat glow
+doas pkg install bash less tree git bat glow
 ln -s /usr/local/share/git-core/contrib/diff-highlight/diff-highlight "${XDG_BIN_HOME:-$HOME/.local/bin}"
 ```
 
