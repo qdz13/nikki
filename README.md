@@ -131,14 +131,14 @@ Similarly, if the current month is January, month can be omitted.
 nikki read 11
 ```
 
-This way is also valid for the subcommand `edit` and `rm`.
+This way is also valid for `edit` and `rm` subcommands.
 
 > [!TIP]
 > The option `--past` is necessary to edit past diaries (This is not a global option!).
 
 ### Remove diaries
 
-If you want to remove past diaries, use `rm` subcommand:
+If you want to remove diaries, use `rm` subcommand:
 
 ```sh
 nikki rm 20260111
@@ -190,4 +190,4 @@ For example:
 nikki read <tab>
 ```
 
-Then past diaries will be displayed as a candidate.
+Then past diaries will be displayed as choices.
