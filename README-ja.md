@@ -2,6 +2,8 @@
 
 [English](README.md) | 日本語
 
+## 概要
+
 `nikki` はBashで書かれたCLIの日記管理プログラムです。
 
 ## 特徴

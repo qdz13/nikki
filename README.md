@@ -2,6 +2,8 @@
 
 English | [日本語](README-ja.md)
 
+## Overview
+
 `nikki` is a command-line diary manager written in Bash.
 
 ## Features
