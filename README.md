@@ -1,5 +1,7 @@
 # nikki
 
+English | [日本語](README-ja.md)
+
 `nikki` is a command-line diary manager written in Bash.
 
 ## Features
