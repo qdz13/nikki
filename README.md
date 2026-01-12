@@ -156,7 +156,6 @@ nikki restore
 ### Tips
 
 By using Zsh completion, you can reduce types.
-
 For example:
 
 ```sh
