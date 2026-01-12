@@ -5,12 +5,13 @@
 
 usage() {
 	cat >&2 <<-EOF
-	Usage: $progname [-h] [-p pager] <command> [options]
+	Usage: $progname [-h] [--version] [-p pager] <command> [options]
 	       $progname
 
 	Global options:
-	  -h, --help     Display this help message and exit
-	      --pager    Set pager (cat, less, bat (default), glow)
+	  -h, --help        Display this help message and exit
+	      --pager       Set pager (cat, less, bat (default), glow)
+		  --version     Display version information and exit
 
 	Commands:
 	  edit       Edit diaries
@@ -413,10 +414,11 @@ sc_restore() {
 
 main() {
 	local i subcmd pager
-	declare progname datadir editor tmp
+	declare progname version datadir editor tmp
 	declare -a pagercmd
 
 	progname=nikki
+	version=0.1
 	datadir="${XDG_DATA_HOME:-$HOME/.local/share}/$progname"
 	mkdir -p "$datadir" "$datadir/diaries" "$datadir/backup"
 	#shellcheck disable=SC2153
@@ -440,6 +442,10 @@ main() {
 					exit 1
 				fi
 				pager="$1"
+				;;
+			--version)
+				echo "$progname $version"
+				exit
 				;;
 			-*)
 				perror "Invalid option: $1"

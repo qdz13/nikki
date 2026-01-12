@@ -52,6 +52,7 @@ _nikki() {
 	_arguments \
 		'(- *)'{-h,--help}'[Display help message and exit]' \
 		'(--pager)--pager[Set pager]:pager:(cat less bat glow)' \
+		'(- *)--version[Display version information and exit]' \
 		'1: :->cmd' \
 		'*:: :->arg' && ret=0
 
