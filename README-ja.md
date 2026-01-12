@@ -31,6 +31,8 @@
 ## インストール
 
 ```sh
+git clone 'https://codeberg.org/qdz13/nikki.git'
+cd nikki
 sudo make install
 ```
 
