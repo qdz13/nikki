@@ -217,7 +217,7 @@ times = true
 
 #### Rsyncとscpを用いた日記のバックアップ
 
-もし単に日記をリモートにバックアップしたい場合、[Rsync](https://rsync.samba.org/)が良い選択肢です。
+単に日記をリモートにバックアップしたい場合、[Rsync](https://rsync.samba.org/)が良い選択肢です。
 
 ```sh
 rsync -mrt "${XDG_DATA_HOME:$HOME/.local/share}/nikki" ssh://username@remotehostname//path/to/backup/directory/nikki
