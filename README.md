@@ -183,6 +183,8 @@ nikki restore
 
 ### Tips
 
+#### Zsh completion
+
 By using Zsh completion, you can reduce types.
 For example:
 
@@ -191,3 +193,38 @@ nikki read <tab>
 ```
 
 Then past diaries will be displayed as choices.
+
+#### Synchronization with remote using Unison
+
+If you want to write a diary from any computer at home,
+It is recommended to use [Unison](https://www.cis.upenn.edu/~bcpierce/unison/).
+
+This is example profile:
+
+```
+root = /home/username
+root = ssh://username@remotehostname//home/username
+
+path = .local/share/nikki
+
+batch = true
+times = true
+```
+
+Fix usernames and place it in `~/.unison/nikki.prf`.
+
+Then, you can synchronization diaries by running `unison nikki`.
+
+#### Backup all diaries using Rsync and scp
+
+If you just want to back up your diaries to remote, [Rsync](https://rsync.samba.org/) is a good choice.
+
+```sh
+rsync -mrt "${XDG_DATA_HOME:$HOME/.local/share}/nikki" ssh://username@remotehostname//path/to/backup/directory/nikki
+```
+
+Or using `scp`:
+
+```sh
+scp -pr "${XDG_DATA_HOME:$HOME/.local/share}/nikki" ssh://username@remotehostname//path/to/backup/directory/nikki
+```

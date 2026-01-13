@@ -183,6 +183,8 @@ nikki restore
 
 ### ヒント
 
+#### Zsh補完
+
 Zsh補完を使うことで、タイプ数を削減できます。
 例:
 
@@ -191,3 +193,38 @@ nikki read <tab>
 ```
 
 すると過去の日記が候補として表示されます。
+
+#### Unisonを用いたリモートとの同期
+
+自宅にあるどのコンピューターからでも日記を書きたい場合、
+[Unison](https://www.cis.upenn.edu/~bcpierce/unison/)が推奨されます。
+
+これはプロファイルの例です:
+
+```
+root = /home/username
+root = ssh://username@remotehostname//home/username
+
+path = .local/share/nikki
+
+batch = true
+times = true
+```
+
+ユーザー名を修正し `~/.unison/nikki.prf` に配置します。
+
+そして、 `unison nikki` を実行することで日記を同期できます。
+
+#### Rsyncとscpを用いた日記のバックアップ
+
+もし単に日記をリモートにバックアップしたい場合、[Rsync](https://rsync.samba.org/)が良い選択肢です。
+
+```sh
+rsync -mrt "${XDG_DATA_HOME:$HOME/.local/share}/nikki" ssh://username@remotehostname//path/to/backup/directory/nikki
+```
+
+または `scp` を使います:
+
+```sh
+scp -pr "${XDG_DATA_HOME:$HOME/.local/share}/nikki" ssh://username@remotehostname//path/to/backup/directory/nikki
+```
